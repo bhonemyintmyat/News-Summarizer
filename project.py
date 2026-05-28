@@ -27,9 +27,9 @@ def start(main_cat):
     menu_items = soup.find_all("li", class_="menu__item--aje")
 
     for item in menu_items:
-        # 2. Go one layer deeper to find the actual link tag
+        # Go one layer deeper to find the actual link tag
         link_tag = item.find("a")
-        # 3. Always check if the tag exists to prevent errors!
+        # Always check if the tag exists to prevent errors!
         if link_tag:
             url = link_tag.get('href')
             name = link_tag.get_text(strip=True)
@@ -66,7 +66,6 @@ def get_news(clean_url):
     news_list = []
     d = date.today()
     res = f"/{d.year}/{d.month}/{d.day}/"
-    #res = f"/2026/5/19/"
     update = requests.get(clean_url, headers = AGENT)
     bsoj = BeautifulSoup(update.text, "html.parser")
     headline_cards = bsoj.find_all("h2", class_="article-card__title")
@@ -77,10 +76,9 @@ def get_news(clean_url):
         if link_tag:
             article_url = link_tag.get("href")
             
-            # Now we safely check if today's date string is in the URL
+            # check if today's date string is in the URL
             if article_url and res in article_url:
                 title = card.get_text(strip=True)
-                #news_list.append(f"NEW TODAY: {title}")
                 news_list.append(f"https://www.aljazeera.com{article_url}\n")
             else:
                 # It's an older story, skip it
@@ -99,7 +97,7 @@ def get_content(update):
         title_tag = content.find("h1")
         if body_container and title_tag:
     
-    # 2. Search for all <p> tags ONLY inside that specific container
+    #Search for all <p> tags ONLY inside that specific container
             paragraphs = body_container.find_all("p")
             text_list = [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
             single_article = " ".join(text_list)
@@ -134,7 +132,6 @@ def gemini(content):
         
         # 2. The API Call
         try:
-            # Note: I swapped this back to 'gemini-2.5-flash' based on your rate limit screenshot! 
             response = client.models.generate_content(
                 model='gemini-3.5-flash', 
                 contents=my_prompt
@@ -181,7 +178,6 @@ def create_pdf(ai_sum):
     
     # Loop through the data and print to PDF
     for index, ai_text in enumerate(ai_sum, 1):
-
         lines = ai_text.split("\n")
         raw_headline = lines[0].replace("TITLE: ", "").strip()
         raw_summary = "\n".join(lines[1:]).strip()
@@ -200,11 +196,8 @@ def create_pdf(ai_sum):
         pdf.set_font("Helvetica", style="", size=11)
         pdf.set_text_color(0, 0, 0) #pure black
         pdf.multi_cell(w=0, h=6, text=summary)
-
-        
         # Divider Space
         pdf.ln(10)
-        
     # Save the document
     pdf.output("Your Daily News.pdf")
     print(f"✅ Success! Open {"Your Daily News.pdf"} to see the result.")
